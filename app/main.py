@@ -3,21 +3,24 @@ import os
 
 def move_file(command: str) -> None:
 
-    operation, file_old, file_new = command.split(" ")
+    try:
+        operation, file_old, file_new = command.split(" ")
+    except ValueError:
+        return
 
-    if operation == "mv":
-        path = ""
+    if operation != "mv":
+        return
 
-        for dir_name in file_new.split("/")[:-1]:
-            try:
-                os.mkdir(path + dir_name)
-            except FileExistsError:
-                pass
-            path += dir_name + "/"
+    path = ""
 
-        old_file = open(file_old, "r")
-        new_file = open(file_new, "w")
+    for dir_name in file_new.split("/")[:-1]:
+        path = os.path.join(path, dir_name)
+        try:
+            os.mkdir(path)
+        except FileExistsError:
+            pass
 
+    with open(file_old, "r") as old_file, open(file_new, "w") as new_file:
         new_file.write(old_file.read())
-        old_file.close()
-        os.remove(file_old)
+
+    os.remove(file_old)
