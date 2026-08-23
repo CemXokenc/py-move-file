@@ -4,21 +4,20 @@ import os
 def move_file(command: str) -> None:
 
     try:
-        operation, file_old, file_new = command.split(" ")
+        operation, file_old, file_new = command.split()
     except ValueError:
         return
 
     if operation != "mv":
         return
 
-    path = ""
+    if file_new.endswith("/"):
+        file_new = os.path.join(file_new, os.path.basename(file_old))
 
-    for dir_name in file_new.split("/")[:-1]:
-        path = os.path.join(path, dir_name)
-        try:
-            os.mkdir(path)
-        except FileExistsError:
-            pass
+    directory = os.path.dirname(file_new)
+
+    if directory:
+        os.makedirs(directory, exist_ok=True)
 
     with open(file_old, "r") as old_file, open(file_new, "w") as new_file:
         new_file.write(old_file.read())
